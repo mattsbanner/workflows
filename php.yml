@@ -1,0 +1,25 @@
+name: PHP
+
+on:
+  workflow_call:
+
+jobs:
+  define:
+    name: Define
+    outputs:
+      php_version: ${{ steps.output.outputs.php_version }}
+      phpstan_level: ${{ steps.output.outputs.phpstan_level }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: Output
+        id: output
+        run: |
+          php .github/scripts/define.php
