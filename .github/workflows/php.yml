@@ -29,3 +29,43 @@ jobs:
         id: output
         run: |
           php workflows/.github/scripts/define.php
+
+  pint:
+    name: Laravel Pint
+    runs-on: ubuntu-22.04
+    needs:
+      - define
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ needs.define.outputs.php_version }}
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v2
+
+      - name: Run Laravel Pint
+        run: vendor/bin/pint --test
+
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-22.04
+    needs:
+      - define
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ needs.define.outputs.php_version }}
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v2
+
+      - name: PHPStan Analyse
+        run: ./vendor/bin/phpstan analyse --level ${{ needs.define.outputs.phpstan_level }}
