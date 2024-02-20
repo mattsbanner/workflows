@@ -3,9 +3,10 @@ name: PHP
 on:
   workflow_call:
     inputs:
-      docker_build_target:
+      docker-build-target:
         description: 'Docker target to build and optionally publish'
         required: true
+        type: string
 
 jobs:
   define:
