@@ -11,10 +11,14 @@ jobs:
       phpstan_level: ${{ steps.output.outputs.phpstan_level }}
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout repository
+      - name: Checkout app repository
+        uses: actions/checkout@v4
+
+      - name: Checkout workflows repository
         uses: actions/checkout@v4
         with:
           repository: ${{ github.repository_owner }}/workflows
+          path: workflows
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -24,4 +28,4 @@ jobs:
       - name: Output
         id: output
         run: |
-          php .github/scripts/define.php
+          php workflows/.github/scripts/define.php
