@@ -1,6 +1,6 @@
 <?php
 
-const BASE_DIR = __DIR__.'/../..';
+const BASE_DIR = __DIR__.'/../../../';
 
 setOutput('php_version', getPhpVersion());
 setOutput('phpstan_level', (string) getPhpStanLevel());
