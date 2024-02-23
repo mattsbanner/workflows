@@ -3,9 +3,13 @@ name: PHP
 on:
   workflow_call:
     inputs:
+      docker-build:
+        description: 'Whether the Docker image should be built and optionally published'
+        default: true
+        type: boolean
       docker-build-target:
         description: 'Docker target to build and optionally publish'
-        required: true
+        default: prod
         type: string
 
 jobs:
@@ -77,6 +81,7 @@ jobs:
 
   docker:
     name: Docker
+    if: ${{ inputs.docker-build }}
     runs-on: ubuntu-22.04
     needs:
       - pint
