@@ -1,7 +1,7 @@
 <?php
 
 $define = new Define(
-    workingDir: $_ARGV[1] ?? null
+    workingDir: $argv[1] ?? null
 );
 $define();
 
