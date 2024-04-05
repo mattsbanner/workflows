@@ -64,6 +64,7 @@ jobs:
         uses: ramsey/composer-install@v2
         with:
           working-directory: ${{ inputs.app-directory }}
+          composer-options: "--ignore-platform-reqs"
 
       - name: Run Laravel Pint
         working-directory: ${{ inputs.app-directory }}
@@ -87,6 +88,7 @@ jobs:
         uses: ramsey/composer-install@v2
         with:
           working-directory: ${{ inputs.app-directory }}
+          composer-options: "--ignore-platform-reqs"
 
       - name: PHPStan Analyse
         working-directory: ${{ inputs.app-directory }}
