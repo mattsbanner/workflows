@@ -11,6 +11,10 @@ on:
         description: 'Docker target to build and optionally publish'
         default: prod
         type: string
+      app-directory:
+        description: 'The directory containing the app code'
+        default: ./
+        type: string
 
 env:
   APP_ENV: testing
@@ -40,7 +44,7 @@ jobs:
       - name: Output
         id: output
         run: |
-          php workflows/.github/scripts/define.php
+          php workflows/.github/scripts/define.php ${{ inputs.app-directory }}
 
   pint:
     name: Laravel Pint
@@ -58,8 +62,11 @@ jobs:
 
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v2
+        with:
+          working-directory: ${{ inputs.app-directory }}
 
       - name: Run Laravel Pint
+        working-directory: ${{ inputs.app-directory }}
         run: vendor/bin/pint --test
 
   phpstan:
@@ -78,8 +85,11 @@ jobs:
 
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v2
+        with:
+          working-directory: ${{ inputs.app-directory }}
 
       - name: PHPStan Analyse
+        working-directory: ${{ inputs.app-directory }}
         run: ./vendor/bin/phpstan analyse --level ${{ needs.define.outputs.phpstan_level }}
 
   docker:
