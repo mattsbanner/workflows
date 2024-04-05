@@ -13,11 +13,15 @@ class Define
         ?string $workingDir = null
     )
     {
+        echo "Working dir: $workingDir\n";
+
         $this->path = __DIR__.'/../../..';
 
         if (! is_null($workingDir)) {
             $this->path = sprintf('%s/%s', $this->path, $workingDir);
         }
+
+        echo "Path: $this->path\n";
     }
 
     public function __invoke(): void
