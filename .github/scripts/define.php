@@ -9,6 +9,8 @@ class Define
 {
     private string $path;
 
+    private array $composerConfig;
+
     public function __construct(
         ?string $workingDir = null
     )
@@ -22,12 +24,18 @@ class Define
         }
 
         echo "Path: $this->path\n";
+
+        $this->composerConfig = json_decode(
+            file_get_contents($this->path.'/composer.json'),
+            true
+        );
     }
 
     public function __invoke(): void
     {
         $this->setOutput('php_version', $this->getPhpVersion());
         $this->setOutput('phpstan_level', (string) $this->getPhpStanLevel());
+        $this->setOutput('pint_arguments', $this->getPintArguments());
     }
 
     private function setOutput(string $name, string $value): void
@@ -35,19 +43,24 @@ class Define
         exec("echo $name=$value >> \$GITHUB_OUTPUT");
     }
 
-    private function getPhpVersion(): string
+    private function usesPackage(string $package): bool
     {
-        $composer = json_decode(
-            file_get_contents($this->path.'/composer.json'),
-            true
+        $packages = array_merge(
+            $this->composerConfig['require'] ?? [],
+            $this->composerConfig['require-dev'] ?? []
         );
 
-        if (! isset($composer['config']['platform']['php'])) {
+        return isset($packages[$package]);
+    }
+
+    private function getPhpVersion(): string
+    {
+        if (! isset($this->composerConfig['config']['platform']['php'])) {
             echo "PHP version not set in composer.json\n";
             exit(1);
         }
 
-        return $composer['config']['platform']['php'];
+        return $this->composerConfig['config']['platform']['php'];
     }
 
     private function getPhpStanLevel(): int
@@ -64,5 +77,14 @@ class Define
             echo "PHPStan level not found in phpstan.neon\n";
             exit(1);
         }
+    }
+
+    private function getPintArguments(): string
+    {
+        if ($this->usesPackage('mattsbanner/laravel-core-dev')) {
+            return '--config=vendor/mattsbanner/laravel-core-dev/pint.json';
+        }
+
+        return '';
     }
 }
