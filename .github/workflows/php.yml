@@ -25,6 +25,7 @@ jobs:
     outputs:
       php_version: ${{ steps.output.outputs.php_version }}
       phpstan_level: ${{ steps.output.outputs.phpstan_level }}
+      pint_arguments: ${{ steps.output.outputs.pint_arguments }}
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout app repository
@@ -68,7 +69,7 @@ jobs:
 
       - name: Run Laravel Pint
         working-directory: ${{ inputs.app-directory }}
-        run: vendor/bin/pint --test
+        run: vendor/bin/pint --test ${{ needs.define.outputs.pint_arguments }}
 
   phpstan:
     name: PHPStan
