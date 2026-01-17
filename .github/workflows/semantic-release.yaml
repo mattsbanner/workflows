@@ -1,0 +1,47 @@
+name: Semantic Release
+
+on:
+  workflow_call:
+
+jobs:
+  release:
+    name: Semantic Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout Config
+        uses: actions/checkout@v4
+        with:
+          repository: mattsbanner/standards
+          path: .standards
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # If the project doesn't have a package.json, create one temporarily to allow npm installs
+      - name: Initialize NPM
+        run: |
+          if [ ! -f package.json ]; then
+            npm init -y >/dev/null 2>&1
+          fi
+
+      - name: Install NPM packages
+        run: |
+          npm install \
+            semantic-release@24 \
+            @semantic-release/commit-analyzer \
+            @semantic-release/release-notes-generator \
+            @semantic-release/github
+
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: npx semantic-release --extends ./.standards/.releaserc.json
