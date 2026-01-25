@@ -1,0 +1,46 @@
+name: Validate Commits
+
+on:
+  workflow_call:
+
+jobs:
+  validate-commits:
+    name: Validate Commits
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+
+      - name: Fetch base branch
+        run: git fetch origin ${{ github.base_ref }}
+
+      - name: Validate commit messages
+        run: |
+          PATTERN='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert): [A-Z]'
+
+          COMMITS=$(git log --format="%s" origin/${{ github.base_ref }}..HEAD)
+
+          FAILED=0
+          while IFS= read -r MSG; do
+            if [[ -z "$MSG" ]]; then
+              continue
+            fi
+            if ! [[ "$MSG" =~ $PATTERN ]]; then
+              echo "❌ Invalid: $MSG"
+              FAILED=1
+            else
+              echo "✓ Valid: $MSG"
+            fi
+          done <<< "$COMMITS"
+
+          if [[ $FAILED -eq 1 ]]; then
+            echo ""
+            echo "Commit messages must follow: type: Message"
+            echo "Valid types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert"
+            echo "Message must start with a capital letter"
+            echo "Please update your commit messages and force push to try again"
+            exit 1
+          fi
